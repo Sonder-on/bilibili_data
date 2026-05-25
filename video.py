@@ -5,7 +5,7 @@ import json
 import subprocess
 from curl_cffi import requests
 
-# ================= 1. Wbi 签名核心算法 (你已经掌握的) =================
+# ================= 1. Wbi 签名核心算法 =================
 MIXIN_KEY_ENC_TAB = [
     46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49,
     33, 9, 42, 19, 29, 28, 14, 39, 12, 38, 41, 13, 37, 48, 7, 16, 24, 55, 40,
@@ -41,17 +41,17 @@ def get_wbi_keys(headers: dict) -> tuple:
 
 
 # ================= 2. 视频下载主逻辑 =================
-
 def download_bilibili_api(bvid: str, my_cookie: str):
+    # 修复了之前代码中硬编码 Cookie 的 Bug，现在动态使用传入的 my_cookie
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Referer': f'https://www.bilibili.com/video/{bvid}/',
-        'Cookie': 'buvid3=73DFC423-B7D4-20CF-3AC6-0D1D1CD5E7E875098infoc; b_nut=1779518775; bsource=search_google; _uuid=C55C6D5C-E9106-AFEC-F5FD-123551177D5676196infoc; buvid_fp=0301ce0ff946fa11e7cb49b2c208d531; home_feed_column=5; browser_resolution=1536-776; buvid4=1BF815A0-C855-4E05-3062-6DDD8511682178017-026052314-wzZrYLNoZlxI9uV0LSzKNg%3D%3D; bili_ticket=eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Nzk3NzgwMDEsImlhdCI6MTc3OTUxODc0MSwicGx0IjotMX0.clW_gWwOg_zmqhVCh8qSJnGJfl138uF5xZNAkdJ_reI; bili_ticket_expires=1779777941; CURRENT_FNVAL=2000; lang=zh-Hans; sid=eqqf0qns; b_lsid=1EDF85F0_19E53B7FA7D'
+        'Cookie': my_cookie
     }
 
     try:
         # Step 1: 获取视频的 cid (这是必传参数)
-        print(f"正在获取 {bvid} 的基本信息(cid)...")
+        print(f"\n正在获取 {bvid} 的基本信息(cid)...")
         view_api = f"https://api.bilibili.com/x/web-interface/view?bvid={bvid}"
         view_res = requests.get(view_api, headers=headers, impersonate="chrome120").json()
 
@@ -114,9 +114,18 @@ def download_bilibili_api(bvid: str, my_cookie: str):
 
 
 if __name__ == '__main__':
-    # 填入你想要爬取的 BV 号
-    TARGET_BVID = ""
-    # ⚠️ 务必填入你浏览器最新的、完整的 Cookie
-    MY_COOKIE = f""
+    print("====================================================")
+    print("             B站 视频下载器 (交互版)")
+    print("====================================================\n")
 
-    download_bilibili_api(TARGET_BVID, MY_COOKIE)
+    # 交互式获取 BV 号
+    target_bvid = input("👉 请输入想要下载的视频 BV 号 (例如 BV1DXLu6QE5e): ").strip()
+    while not target_bvid.startswith("BV"):
+        target_bvid = input("❌ BV 号格式错误 (必须以 BV 开头)，请重新输入: ").strip()
+
+    # 交互式获取 Cookie
+    my_cookie = input("\n👉 请输入你的 B站 Cookie: ").strip()
+    while not my_cookie:
+        my_cookie = input("❌ Cookie 不能为空，请重新输入: ").strip()
+
+    download_bilibili_api(target_bvid, my_cookie)
