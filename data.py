@@ -80,14 +80,26 @@ def print_video_samples(vlist, current_page, crawled_count):
 
 # ================= 3. 主程序任务执行 =================
 if __name__ == '__main__':
-    # 目标 UP 主 UID
-    TARGET_MID = 1346921
+    print("====================================================")
+    print("         B站 UP主信息及视频列表爬虫 (交互版)")
+    print("====================================================\n")
+
+    # 1. 交互式获取 UID
+    target_mid_input = input("👉 请输入目标 UP 主的 UID (例如 1346921): ").strip()
+    while not target_mid_input.isdigit():
+        target_mid_input = input("❌ UID 格式错误，请输入纯数字 UID: ").strip()
+    TARGET_MID = int(target_mid_input)
+
+    # 2. 交互式获取 Cookie
+    dynamic_cookie = input("\n👉 请输入你的 B站 Cookie: ").strip()
+    while not dynamic_cookie:
+        dynamic_cookie = input("❌ Cookie 不能为空，请重新输入: ").strip()
+
+    print("\n⏳ 正在初始化爬虫，请稍候...")
     PAGE_SIZE = 40
     crawled_count = 0  # 用于记录已爬取的视频总数
 
-    # 配置 Headers 与 Cookie
-    dynamic_cookie = "buvid3=73DFC423-B7D4-20CF-3AC6-0D1D1CD5E7E875098infoc; b_nut=1779518775; _uuid=C55C6D5C-E9106-AFEC-F5FD-123551177D5676196infoc; buvid_fp=0301ce0ff946fa11e7cb49b2c208d531; buvid4=1BF815A0-C855-4E05-3062-6DDD8511682178017-026052314-wzZrYLNoZlxI9uV0LSzKNg%3D%3D; bili_ticket=eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Nzk3NzgwMDEsImlhdCI6MTc3OTUxODc0MSwicGx0IjotMX0.clW_gWwOg_zmqhVCh8qSJnGJfl138uF5xZNAkdJ_reI; bili_ticket_expires=1779777941; lang=zh-Hans; CURRENT_QUALITY=0; rpdid=|(Ju~|~km|J)0J'u~~mlku)uu; CURRENT_FNVAL=2000; bsource=search_google; home_feed_column=4; browser_resolution=980-776; bmg_af_switch=1; bmg_src_def_domain=i1.hdslb.com; sid=4klikom6; b_lsid=28D2778A_19E5E35EE30"
-
+    # 配置 Headers
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0',
         'Accept': 'application/json, text/plain, */*',
